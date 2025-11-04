@@ -1,15 +1,18 @@
 import express from 'express';
-import auth from '../../middleware/auth.js';
-import multer from 'multer';
 
+import multer from 'multer';
+import { addProduct,updateProduct,deleteProduct,toggleActiveProduct,getProductById ,getAllProducts} from '../../controllers/Features/productController.js';
+import auth from '../../middleware/auth.js';
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
 
-// router.get('/', auth, getEmployees);
-// router.post('/', auth, roleMiddleware(['Admin', 'SuperAdmin']),  createEmployee);
-// router.put('/:id', auth, roleMiddleware(['Admin', 'SuperAdmin']),  updateEmployee);
-// router.delete('/:id', auth, roleMiddleware(['Admin', 'SuperAdmin']), deleteEmployee);
-// router.post('/import', auth, roleMiddleware(['Admin', 'SuperAdmin']), upload.single('file'), importEmployees);
-//router.get('/sample-excel', downloadSampleExcel);
+router.post("/", auth,addProduct);                 
+router.put("/:id",auth, updateProduct);            
+router.delete("/:id",auth, deleteProduct);             
+router.patch("/:id/toggle",auth, toggleActiveProduct); 
+router.get("/:id",auth, getProductById); 
+router.get("/", getAllProducts); 
+
+
 
 export default router;
