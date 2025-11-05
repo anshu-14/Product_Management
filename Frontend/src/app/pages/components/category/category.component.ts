@@ -1,12 +1,36 @@
 import { Component } from '@angular/core';
 import { TableComponent } from '../../../shared/components/table/table.component';
 import { CategoryService } from '../../../services/category.service';
-
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { CommonModule } from '@angular/common';
+import { TextareaModule } from 'primeng/textarea';
+import { ButtonModule } from 'primeng/button';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { DividerModule } from 'primeng/divider';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 @Component({
   selector: 'app-category',
-  imports: [TableComponent, CommonModule, LoaderComponent],
+  imports: [
+    TableComponent,
+    CommonModule,
+    LoaderComponent,
+    DialogModule,
+    InputTextModule,
+    ButtonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    TextareaModule,
+    ConfirmPopupModule,
+    DividerModule,
+  ],
   templateUrl: './category.component.html',
   styleUrl: './category.component.scss',
 })
@@ -26,11 +50,23 @@ export class CategoryComponent {
     { field: 'IsActive', header: 'Status' },
   ];
   loading = false;
-  constructor(private categoryService: CategoryService) {
-
+  visible: boolean = false;
+  categoryForm!: FormGroup;
+  mode: any = 'add';
+  constructor(
+    private categoryService: CategoryService,
+    private fb: FormBuilder,
+  ) {
+    this.categoryForm = this.createCategoryForm();
+  }
+  createCategoryForm() {
+    return this.fb.group({
+      CategoryId: [null],
+      Name: [null, [Validators.required]],
+      Description: [null],
+    });
   }
   loadPage(e: any) {
-    
     this.query = {
       ...this.query,
       page: e.page,
@@ -40,7 +76,7 @@ export class CategoryComponent {
     };
     this.getCategoryList();
   }
-  getCategoryList() {
+  getCategoryList(isExport: boolean = false) {
     this.loading = true;
     this.categoryService
       .getCategories({
@@ -48,10 +84,11 @@ export class CategoryComponent {
         pageSize: this.query.pageSize,
         orderBy: this.query.orderBy,
         orderDir: this.query.orderDir,
+        isExport: isExport,
       })
       .subscribe((res: any) => {
         this.loading = false;
-  
+
         this.data = res.data.map((item: any) => ({
           ...item,
           IsActive: item.IsActive === 1 ? true : false,
@@ -59,14 +96,139 @@ export class CategoryComponent {
         this.total = res.total ?? 0;
       });
   }
+
+  downloadReport() {
+    this.categoryService
+      .downloadReport({
+        page: this.query.page,
+        pageSize: this.query.pageSize,
+        orderBy: this.query.orderBy,
+        orderDir: this.query.orderDir,
+        isExport: true,
+      })
+      .subscribe({
+        next: (response: any) => {
+          const contentDisposition = response.headers.get('content-disposition');
+      let fileName = 'export.xlsx';
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="(.+)"/);
+        if (match && match[1]) fileName = match[1];
+      }
+
+      // 2️⃣ Create a temporary URL
+      const blob = new Blob([response.body!], { type: response.body?.type });
+      const url = window.URL.createObjectURL(blob);
+
+      // 3️⃣ Create a link and trigger download
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+
+      // 4️⃣ Cleanup
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+        },
+        error: (err) => {
+          if (err.status === 400) {
+            alert('No data to export');
+          } else {
+            console.error('Download failed', err);
+          }
+        },
+      });
+  }
+
+  private getFilenameFromHeader(response: any): string {
+    const header = response.headers.get('content-disposition');
+    const match = header?.match(/filename="?([^"]+)"?/);
+    return match
+      ? match[1]
+      : `report_${new Date().toISOString().split('T')[0]}.xlsx`;
+  }
+
+  getCategoryById(id: any) {
+    this.loading = true;
+    this.mode = 'edit';
+    this.categoryService.getCategoryById(id).subscribe((res: any) => {
+      console.log(res);
+      this.bindCategoryForm(res);
+      this.loading = false;
+      this.visible = true;
+    });
+  }
+  deleteCategory(id: any) {
+    this.loading = true;
+    this.categoryService.deleteCategory(id).subscribe((res: any) => {
+      this.loading = false;
+      this.getCategoryList();
+    });
+  }
+  toggleStatus(event: any) {
+    this.loading = true;
+    this.categoryService
+      .toggleStatus(event.CategoryId, event)
+      .subscribe((res: any) => {
+        this.loading = false;
+        this.getCategoryList();
+      });
+  }
+  bindCategoryForm(data: any) {
+    this.categoryForm.patchValue(data);
+  }
+
+  openAddDialog() {
+    this.mode = 'add';
+    this.visible = true;
+    this.categoryForm.reset({
+      CategoryId: null,
+      Name: null,
+      Description: null,
+    });
+  }
   onToggleActive(event: any) {
-    console.log(event);
+    this.toggleStatus(event);
   }
   onEdit(event: any) {
-    console.log(event);
+    this.getCategoryById(event.CategoryId);
   }
 
   onDelete(event: any) {
-    console.log(event);
+    this.deleteCategory(event.CategoryId);
+  }
+
+  onUpdate() {
+    if (this.categoryForm.invalid) {
+      this.categoryForm.markAllAsTouched();
+      return;
+    }
+    this.loading = true;
+    const data = this.categoryForm.value;
+    if (this.mode === 'edit') {
+      this.categoryService.updateCategory(data.CategoryId, data).subscribe({
+        next: (res: any) => {
+          console.log(res);
+          this.loading = false;
+          this.visible = false;
+          this.getCategoryList();
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
+    } else {
+      this.categoryService.addCategory(data).subscribe({
+        next: (res: any) => {
+          console.log(res);
+          this.loading = false;
+          this.visible = false;
+          this.getCategoryList();
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
+    }
   }
 }

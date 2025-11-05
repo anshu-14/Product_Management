@@ -1,2 +1,40 @@
 <app-loader *ngIf="loading"></app-loader>
-<app-table  [rows]="data" [columns]="columns" [hasAction]="true"  [totalRecords]="total" [rowsPerPage]="query.pageSize" [rowsPerPageOptions]="[10,25,50,100]" (pageChange)="loadPage($event)" (toggleStatus)="onToggleActive($event)" (edit)="onEdit($event)" (delete)="onDelete($event)"></app-table>
+<div class="flex justify-between items-center">
+    <h4 class="m-0 text-2xl font-semibold">Category</h4>
+    <div class="flex gap-2">
+        <button pButton type="button" label="Download Report" icon="pi pi-download"
+            class="p-button-outlined p-button-info" (click)="downloadReport()">
+        </button>
+        <button pButton type="button" label="Add Category" icon="pi pi-plus" (click)="openAddDialog()"></button>
+    </div>
+</div>
+
+<p-divider />
+<app-table [rows]="data" [columns]="columns" [hasAction]="true" [totalRecords]="total" [rowsPerPage]="query.pageSize"
+    [rowsPerPageOptions]="[10,25,50,100]" (pageChange)="loadPage($event)" (toggleStatus)="onToggleActive($event)"
+    (edit)="onEdit($event)" (delete)="onDelete($event)"></app-table>
+
+
+<p-dialog [header]="mode === 'add' ? 'Add Category' : 'Edit Category'" [modal]="true" [(visible)]="visible"
+    [style]="{ width: '25rem' }">
+    <form [formGroup]="categoryForm" (ngSubmit)="onUpdate()">
+        <span class="p-text-secondary block mb-8">
+            {{ mode === 'add' ? 'Create a new category.' : 'Update information.' }}
+        </span>
+        <div class="flex items-center gap-4 mb-4">
+            <label for="Name" class="font-semibold w-24">Name</label>
+            <input pInputText id="Name" class="flex-auto" formControlName="Name" autocomplete="off"
+                placeholder="Enter Category name" />
+        </div>
+
+        <div class="flex items-center gap-4 mb-8">
+            <label for="Description" class="font-semibold w-24">Description</label>
+            <textarea rows="5" cols="20" pTextarea id="Description" class="flex-auto" formControlName="Description"
+                placeholder="Enter Description" autocomplete="off"></textarea>
+        </div>
+        <div class="flex justify-end gap-2">
+
+            <button pButton type="submit" label="Save" [disabled]="categoryForm.invalid"></button>
+        </div>
+    </form>
+</p-dialog>

@@ -2,16 +2,16 @@ import db from "../../config/db.js";
 import { exportData } from "../../utils/exporter.js";
 export const addCategory = async (req, res) => {
   try {
-    console.log(req.body);
-    const { name, description = null, isActive = 1 } = req.body;
+    
+    const { Name, Description = null } = req.body;
     const userId = req.user?.id;
-    if (!name?.trim()) {
+    if (!Name?.trim()) {
       return res.status(400).json({ message: "Name is required" });
     }
 
     const [exists] = await db.query(
       `SELECT 1 FROM categories WHERE Name = ? AND IsDeleted = 0 LIMIT 1`,
-      [name.trim()]
+      [Name.trim()]
     );
     if (exists.length) {
       return res.status(409).json({ message: "Category name already exists" });
@@ -19,8 +19,8 @@ export const addCategory = async (req, res) => {
 
     const [result] = await db.query(
       `INSERT INTO categories (Name, Description, IsActive, IsDeleted, CreatedBy)
-       VALUES (?, ?, ?, 0, ?)`,
-      [name.trim(), description, isActive ? 1 : 0, userId]
+       VALUES (?, ?, 1, 0, ?)`,
+      [Name.trim(), Description, userId]
     );
 
     res
@@ -38,7 +38,7 @@ export const addCategory = async (req, res) => {
 export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, isActive } = req.body;
+    const { Name, Description } = req.body;
     const userId = req.user?.id;
 
     const [rows] = await db.query(
@@ -48,11 +48,11 @@ export const updateCategory = async (req, res) => {
     if (!rows.length)
       return res.status(404).json({ message: "Category not found" });
 
-    if (name !== undefined) {
+    if (Name !== undefined) {
       const [dupes] = await db.query(
         `SELECT 1 FROM categories 
          WHERE Name = ? AND IsDeleted = 0 AND CategoryId <> ? LIMIT 1`,
-        [name, id]
+        [Name, id]
       );
       if (dupes.length)
         return res
@@ -62,18 +62,18 @@ export const updateCategory = async (req, res) => {
     const fields = [];
     const params = [];
 
-    if (name !== undefined) {
+    if (Name !== undefined) {
       fields.push("Name = ?");
-      params.push(name);
+      params.push(Name);
     }
-    if (description !== undefined) {
+    if (Description !== undefined) {
       fields.push("Description = ?");
-      params.push(description);
+      params.push(Description);
     }
-    if (isActive !== undefined) {
-      fields.push("IsActive = ?");
-      params.push(isActive ? 1 : 0);
-    }
+    // if (isActive !== undefined) {
+    //   fields.push("IsActive = ?");
+    //   params.push(isActive ? 1 : 0);
+    // }
 
     fields.push("ModifiedBy = ?");
     params.push(userId);
