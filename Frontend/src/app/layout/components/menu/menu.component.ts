@@ -23,18 +23,15 @@ export class MenuComponent {
         {
             label: 'Home',
             items: [
-                { label: 'Dashboard', icon: 'pi pi-fw pi-sliders-h', routerLink: ['/certify-iq'] }
+                { label: 'Category', icon: 'pi pi-fw pi-sliders-h', routerLink: ['/product-management'] },
+                { label: 'Product', icon: 'pi pi-fw pi-id-card', routerLink: ['/product-management/products'] },
             ]
         },
         {
-            label: 'UI Components',
+            label: 'Imports',
             items: [
-                { label: 'User Exams', icon: 'pi pi-fw pi-id-card', routerLink: ['/certify-iq/user-exams'] },
-                { label: 'Courses', icon: 'pi pi-fw pi-check-square', routerLink: ['/certify-iq/courses'] },
-                { label: 'Lectures', icon: 'pi pi-fw pi-mobile', class: 'rotated-icon', routerLink: ['/certify-iq/lectures'] },
-                { label: 'Update Profiles', icon: 'pi pi-fw pi-table', routerLink: ['/certify-iq/profile'] },
-                { label: 'About', icon: 'pi pi-fw pi-list', routerLink: ['/certify-iq/about'] },
-                { label: 'Contact Us', icon: 'pi pi-fw pi-share-alt', routerLink: ['/certify-iq/contact'] },
+                { label: 'Import Category', icon: 'pi pi-fw pi-id-card', routerLink: ['/product-management/import/category'] },
+                { label: 'Import Product', icon: 'pi pi-fw pi-check-square', routerLink: ['/product-management/import/product'] },
             ]
         }
     ];

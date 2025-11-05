@@ -65,7 +65,7 @@ export class LoginComponent {
           });
           this.authService.setToken(res.token);
           localStorage.setItem('IsAuthicated','true');
-          this.router.navigate(['/certify-iq']);
+          this.router.navigate(['/product-management']);
         }
         else{
           this.isLoading = false;

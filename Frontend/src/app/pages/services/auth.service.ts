@@ -27,10 +27,7 @@ export class AuthService {
     localStorage.setItem('token', token);
   }
 
-  getCategoryById()
-  {
-    return this.http.get(`${environment.apiUrl}/categories/1`);
-  }
+
 
   clearToken() {
     localStorage.removeItem('token');
