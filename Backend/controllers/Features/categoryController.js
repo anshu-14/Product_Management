@@ -1,8 +1,8 @@
 import db from "../../config/db.js";
 import { exportData } from "../../utils/exporter.js";
+import exceljs from "exceljs";
 export const addCategory = async (req, res) => {
   try {
-    
     const { Name, Description = null } = req.body;
     const userId = req.user?.id;
     if (!Name?.trim()) {
@@ -237,5 +237,95 @@ export const getAllCategories = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const importEmployees = async (req, res) => {
+  try {
+    let conn;
+    const workbook = new exceljs.Workbook();
+    await workbook.xlsx.load(req.file.buffer);
+    const worksheet = workbook.getWorksheet(1);
+    const categories = [];
+
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber > 1) {
+       const Name = (row.getCell(1).value ?? "").toString().trim();
+        const Description = row.getCell(2).value ? row.getCell(2).value.toString().trim() : null;
+        if (Name) {
+          categories.push({ Name, Description });
+        }
+      }
+    });
+   if (!categories.length) {
+      return res.status(400).json({ message: "No valid data rows found in Excel." });
+    }
+       const userId = req.user?.id ?? 1;
+    const now = new Date();
+    const summary = { inserted: 0, skipped: 0, errors: [] };
+
+    const insertSql = `
+      INSERT INTO categories (Name, Description, IsActive, IsDeleted, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
+      SELECT ?, ?, 1, 0, ?, ?, ?, ?
+      WHERE NOT EXISTS (SELECT 1 FROM categories WHERE Name = ?)
+    `;
+
+    for (let i = 0; i < categories.length; i++) {
+      const rnum = i + 2;
+      const { Name, Description } = categories[i];
+
+      try {
+        const [result] = await db.query(insertSql, [
+          Name,
+          Description,
+          userId,
+          now,
+          userId,
+          now,
+          Name
+        ]);
+
+        if (result.affectedRows > 0) {
+          summary.inserted++;
+        } else {
+          summary.skipped++;
+        }
+      } catch (e) {
+        summary.skipped++;
+        summary.errors.push({ row: rnum, error: e?.message ?? "Row insert error" });
+      }
+    }
+
+    res.status(200).json({ 
+      message: "Categories imported successfully",
+      summary
+    });
+  } catch (err) {
+    res.status(500).json({ message: err?.message ?? "Import failed" });
+  }
+};
+
+export const downloadSampleExcel = async (req, res) => {
+  try {
+    const workbook = new exceljs.Workbook();
+    const worksheet = workbook.addWorksheet("Categories");
+
+    worksheet.addRow(["Name", "Description"]);
+
+    worksheet.addRow(["Imported", "Test"]);
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=sample_categories.xlsx"
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

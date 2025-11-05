@@ -57,4 +57,16 @@ export class CategoryService {
   deleteCategory(id:any) {
     return this.http.delete(`${environment.apiUrl}/categories/${id}`);
   }
+
+  importCategories(formData: FormData) {
+    return this.http.post<any>(`${environment.apiUrl}/categories/import`, formData);
+  }
+
+  downloadSample()
+  {
+     return this.http.get(`${environment.apiUrl}/categories/sample`, {responseType: 'blob',      // CRITICAL: tell Angular it's a file
+      observe: 'response'
+    });
+
+  }
 }

@@ -1,1 +1,28 @@
-<p>category-import works!</p>
+<div class="flex justify-between items-center">
+    <h4 class="m-0 text-2xl font-semibold">Import Category</h4>
+    
+        <button pButton type="button" label="Download Sample" icon="pi pi-download"
+            class="p-button-outlined p-button-info" (click)="downloadReport()">
+        </button>
+    
+</div>
+
+<p-divider />
+<p-fileupload
+  #fileUpload
+  mode="basic"
+  chooseLabel="Choose Excel File"
+  chooseIcon="pi pi-upload"
+  name="file"
+  [customUpload]="true"
+  accept=".xlsx"
+  maxFileSize="5000000"
+  (uploadHandler)="onUpload($event)"
+></p-fileupload>
+
+<p-button
+  label="Upload"
+  icon="pi pi-cloud-upload"
+  severity="secondary"
+  (onClick)="fileUpload.upload()"
+></p-button>
