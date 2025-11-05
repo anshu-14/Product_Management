@@ -12,10 +12,21 @@ export class TableComponent {
   @Input() columns=[];
   @Input() rows=[];
   @Input() loading=false;
-  @Output() toggleStatus=new EventEmitter<any>();
+  @Input() hasAction = false;
+  @Output() toggleStatus=new EventEmitter();
+  @Output() edit = new EventEmitter();   
+  @Output() delete = new EventEmitter();
   
   onToggleActive(row: any) {
     this.toggleStatus.emit( row );
+  }
+
+  onEdit(row: any) {
+    this.edit.emit(row);
+  }
+
+  onDelete(row: any) {
+    this.delete.emit(row);
   }
   
 }

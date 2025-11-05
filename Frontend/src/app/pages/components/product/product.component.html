@@ -1,2 +1,2 @@
 <app-loader *ngIf="loading"></app-loader>
-<app-table [rows]="data" [columns]="columns" (toggleStatus)="onToggleActive($event)"></app-table>
+<app-table [rows]="data" [columns]="columns" [hasAction]="true"  (toggleStatus)="onToggleActive($event)" (edit)="onEdit($event)" (delete)="onDelete($event)"></app-table>

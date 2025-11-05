@@ -19,11 +19,12 @@ export class CategoryComponent {
   ];
   loading = false;
   constructor(private categoryService: CategoryService) {
-    this.loading = true;
+    
     this.getCategoryList();
   }
 
   getCategoryList() {
+    this.loading = true;
     this.categoryService.getCategories().subscribe((res: any) => {
       this.loading = false;
       this.data = res.data.map((item: any) => ({
@@ -34,6 +35,13 @@ export class CategoryComponent {
     });
   }
   onToggleActive(event: any) {
+    console.log(event);
+  }
+  onEdit(event: any) {
+    console.log(event);
+  }
+
+  onDelete(event: any) {
     console.log(event);
   }
 }

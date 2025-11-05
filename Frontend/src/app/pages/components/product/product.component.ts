@@ -7,26 +7,25 @@ import { LoaderComponent } from '../../../shared/components/loader/loader.compon
 
 @Component({
   selector: 'app-product',
-  imports: [TableComponent,CommonModule,LoaderComponent],
+  imports: [TableComponent, CommonModule, LoaderComponent],
   templateUrl: './product.component.html',
-  styleUrl: './product.component.scss'
+  styleUrl: './product.component.scss',
 })
 export class ProductComponent {
-data: any = [];
+  data: any = [];
   columns: any = [
     { field: 'Name', header: 'Name' },
     { field: 'CategoryName', header: 'Category' },
     { field: 'IsActive', header: 'Status' },
   ];
-    loading = false;
+  loading = false;
   constructor(private productService: ProductService) {
-    this.loading=true;
-   this.getProductsList();
+    this.getProductsList();
   }
-  getProductsList()
-  {
-this.productService.getProducts().subscribe((res: any) => {
-  this.loading=false;
+  getProductsList() {
+    this.loading = true;
+    this.productService.getProducts().subscribe((res: any) => {
+      this.loading = false;
       this.data = res.data.map((item: any) => ({
         ...item,
         IsActive: item.IsActive === 1 ? true : false,
@@ -35,6 +34,13 @@ this.productService.getProducts().subscribe((res: any) => {
     });
   }
   onToggleActive(event: any) {
+    console.log(event);
+  }
+  onEdit(event: any) {
+    console.log(event);
+  }
+
+  onDelete(event: any) {
     console.log(event);
   }
 }
