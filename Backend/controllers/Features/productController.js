@@ -12,14 +12,12 @@ export const addProduct = async (req, res) => {
     if (categoryId == null) return res.status(400).json({ message: "CategoryId is required" });
     if (price == null || isNaN(price)) return res.status(400).json({ message: "Valid price is required" });
 
-    // ensure category exists and not deleted
     const [cat] = await db.query(
       `SELECT CategoryId FROM categories WHERE CategoryId = ? AND IsDeleted = 0`,
       [categoryId]
     );
     if (!cat.length) return res.status(400).json({ message: "Invalid CategoryId" });
 
-    // unique name among non-deleted products
     const [dupe] = await db.query(
       `SELECT 1 FROM products WHERE Name = ? AND IsDeleted = 0 LIMIT 1`,
       [name.trim()]
@@ -42,10 +40,7 @@ export const addProduct = async (req, res) => {
   }
 };
 
-/**
- * PUT /api/products/:id
- * body: { name?, categoryId?, price?, isActive? }
- */
+
 export const updateProduct = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -54,7 +49,7 @@ export const updateProduct = async (req, res) => {
     const { id } = req.params;
     const { name, categoryId, price, isActive } = req.body;
 
-    // must exist & not deleted
+
     const [exists] = await db.query(
       `SELECT ProductId FROM products WHERE ProductId = ? AND IsDeleted = 0`,
       [id]
@@ -70,7 +65,7 @@ export const updateProduct = async (req, res) => {
       if (dupes.length) return res.status(409).json({ message: "Product name already exists" });
     }
 
-    // if categoryId provided, validate
+
     if (categoryId !== undefined) {
       const [cat] = await db.query(
         `SELECT CategoryId FROM categories WHERE CategoryId = ? AND IsDeleted = 0`,
@@ -90,7 +85,6 @@ export const updateProduct = async (req, res) => {
     }
     if (isActive !== undefined) { fields.push("IsActive = ?"); params.push(isActive ? 1 : 0); }
 
-    // audit
     fields.push("ModifiedBy = ?");
     params.push(userId);
     fields.push("ModifiedAt = NOW()");
@@ -115,9 +109,7 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-/**
- * DELETE /api/products/:id  (soft delete)
- */
+
 export const deleteProduct = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -142,9 +134,7 @@ export const deleteProduct = async (req, res) => {
 
 
 
-/**
- * PATCH /api/products/:id/toggle
- */
+
 export const toggleActiveProduct = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -176,9 +166,7 @@ export const toggleActiveProduct = async (req, res) => {
   }
 };
 
-/**
- * GET /api/products/:id
- */
+
 export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -253,7 +241,7 @@ export const getAllProducts = async (req, res) => {
     ];
 
     const [resultSets] = await db.query(
-      "CALL sp_get_products(?, ?, ?, ?, ?, ?,?)",
+      "CALL sp_get_productsV2(?, ?, ?, ?, ?, ?,?)",
       params
     );
 

@@ -1,6 +1,6 @@
+import { CategoryService } from '../../../services/category.service';
 import { Component } from '@angular/core';
 import { TableComponent } from '../../../shared/components/table/table.component';
-import { CategoryService } from '../../../services/category.service';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
@@ -139,13 +139,7 @@ export class CategoryComponent {
       });
   }
 
-  private getFilenameFromHeader(response: any): string {
-    const header = response.headers.get('content-disposition');
-    const match = header?.match(/filename="?([^"]+)"?/);
-    return match
-      ? match[1]
-      : `report_${new Date().toISOString().split('T')[0]}.xlsx`;
-  }
+
 
   getCategoryById(id: any) {
     this.loading = true;

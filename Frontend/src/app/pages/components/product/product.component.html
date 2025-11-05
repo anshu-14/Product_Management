@@ -1,2 +1,43 @@
 <app-loader *ngIf="loading"></app-loader>
+<div class="flex justify-between items-center">
+    <h4 class="m-0 text-2xl font-semibold">Product</h4>
+    <div class="flex gap-2">
+        <button pButton type="button" label="Download Report" icon="pi pi-download"
+            class="p-button-outlined p-button-info" (click)="downloadReport()">
+        </button>
+        <button pButton type="button" label="Add Product" icon="pi pi-plus" (click)="openAddDialog()"></button>
+    </div>
+</div>
+<p-divider />
 <app-table [rows]="data" [columns]="columns" [hasAction]="true" [totalRecords]="total" [rowsPerPage]="query.pageSize" [rowsPerPageOptions]="[10,25,50,100]" (pageChange)="loadPage($event)"  (toggleStatus)="onToggleActive($event)" (edit)="onEdit($event)" (delete)="onDelete($event)"></app-table>
+
+<p-dialog [header]="mode === 'add' ? 'Add Product' : 'Edit Product'" [modal]="true" [(visible)]="visible"
+    [style]="{ width: '25rem' }">
+    <form [formGroup]="productForm" (ngSubmit)="onUpdate()">
+        <span class="p-text-secondary block mb-8">
+            {{ mode === 'add' ? 'Create a new Product.' : 'Update information.' }}
+        </span>
+        <div class="flex items-center gap-4 mb-4">
+            <label for="Name" class="font-semibold w-24">Name</label>
+            <input pInputText id="Name" class="flex-auto" formControlName="Name" autocomplete="off"
+                placeholder="Enter Product name" />
+        </div>
+
+        <div class="flex items-center gap-4 mb-4">
+            <label for="CategoryId" class="font-semibold w-24">Category</label>
+            <p-select [options]="categories" formControlName="CategoryId" optionLabel="Name" optionValue="CategoryId" placeholder="Select a Category" class="w-full md:w-56" />
+          
+        </div>
+
+        <div class="flex items-center gap-4 mb-8">
+            <label for="Price" class="font-semibold w-24">Price</label>
+            <p-inputnumber formControlName="Price" mode="currency" inputId="currency-india" currency="INR" currencyDisplay="code" locale="en-IN" />
+
+            
+        </div>
+        <div class="flex justify-end gap-2">
+
+            <button pButton type="submit" label="Save" [disabled]="productForm.invalid"></button>
+        </div>
+    </form>
+</p-dialog>
