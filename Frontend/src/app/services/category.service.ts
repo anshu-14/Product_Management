@@ -12,7 +12,14 @@ export class CategoryService {
     return this.http.get(`${environment.apiUrl}/categories/${id}`);
   }
 
-  getCategories(){
-    return this.http.get(`${environment.apiUrl}/categories`);
+  getCategories(params: {
+  page: number;
+  pageSize: number;
+  orderBy: string;
+  orderDir: 'ASC' | 'DESC';
+  search?: string;
+  isActive?: boolean | null;
+}){
+    return this.http.get(`${environment.apiUrl}/categories`,{ params: params as any });
   }
 }

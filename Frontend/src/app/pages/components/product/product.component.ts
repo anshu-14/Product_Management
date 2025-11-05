@@ -12,6 +12,14 @@ import { LoaderComponent } from '../../../shared/components/loader/loader.compon
   styleUrl: './product.component.scss',
 })
 export class ProductComponent {
+   query = {
+    page: 1,
+    pageSize: 10,
+    orderBy: 'ProductId',
+    orderDir: 'ASC' as 'ASC' | 'DESC',
+    filters: { search: '', isActive: null as boolean | null },
+  };
+  total = 0;
   data: any = [];
   columns: any = [
     { field: 'Name', header: 'Name' },
@@ -20,17 +28,35 @@ export class ProductComponent {
   ];
   loading = false;
   constructor(private productService: ProductService) {
+    //this.getProductsList();
+  }
+
+  loadPage(e: any) {
+    
+    this.query = {
+      ...this.query,
+      page: e.page,
+      pageSize: e.size,
+      orderBy: e.sortField ?? this.query.orderBy,
+      orderDir: e.sortOrder === -1 ? 'DESC' : 'ASC',
+    };
     this.getProductsList();
   }
   getProductsList() {
     this.loading = true;
-    this.productService.getProducts().subscribe((res: any) => {
+    this.productService.getProducts({
+        page: this.query.page,
+        pageSize: this.query.pageSize,
+        orderBy: this.query.orderBy,
+        orderDir: this.query.orderDir,
+      }).subscribe((res: any) => {
       this.loading = false;
       this.data = res.data.map((item: any) => ({
         ...item,
         IsActive: item.IsActive === 1 ? true : false,
       }));
       console.log(this.data);
+      this.total = res.total ?? 0;
     });
   }
   onToggleActive(event: any) {

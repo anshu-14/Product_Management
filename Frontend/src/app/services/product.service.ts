@@ -12,7 +12,14 @@ constructor(private http: HttpClient) { }
     return this.http.get(`${environment.apiUrl}/products/${id}`);
   }
 
-  getProducts(){
-    return this.http.get(`${environment.apiUrl}/products`);
+  getProducts(params: {
+  page: number;
+  pageSize: number;
+  orderBy: string;
+  orderDir: 'ASC' | 'DESC';
+  search?: string;
+  isActive?: boolean | null;
+}){
+    return this.http.get(`${environment.apiUrl}/products`,{ params: params as any });
   }
 }

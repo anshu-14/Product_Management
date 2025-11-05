@@ -1,4 +1,13 @@
-<p-table [columns]="columns" [value]="rows" [tableStyle]="{ 'min-width': '50rem' }">
+<p-table [columns]="columns" [value]="rows" [tableStyle]="{ 'min-width': '50rem' }"
+
+[paginator]="true"
+  [rows]="rowsPerPage"
+  [totalRecords]="totalRecords"
+  [rowsPerPageOptions]="rowsPerPageOptions"
+  [lazy]="true"
+  (onLazyLoad)="onLazyLoad($event)"
+  sortMode="single"
+>
     <ng-template #header let-columns>
         <tr>
             <th *ngFor="let col of columns">
