@@ -98,6 +98,7 @@ export class CategoryComponent {
   }
 
   downloadReport() {
+    this.loading = true;
     this.categoryService
       .downloadReport({
         page: this.query.page,
@@ -108,34 +109,32 @@ export class CategoryComponent {
       })
       .subscribe({
         next: (response: any) => {
-          const contentDisposition = response.headers.get('content-disposition');
-      let fileName = 'export.xlsx';
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="(.+)"/);
-        if (match && match[1]) fileName = match[1];
-      }
+          const contentDisposition = response.headers.get(
+            'content-disposition',
+          );
+          let fileName = 'Category.xlsx';
+          if (contentDisposition) {
+            const match = contentDisposition.match(/filename="(.+)"/);
+            if (match && match[1]) fileName = match[1];
+          }
 
-      // 2️⃣ Create a temporary URL
-      const blob = new Blob([response.body!], { type: response.body?.type });
-      const url = window.URL.createObjectURL(blob);
+          const blob = new Blob([response.body!], {
+            type: response.body?.type,
+          });
+          const url = window.URL.createObjectURL(blob);
 
-      // 3️⃣ Create a link and trigger download
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
 
-      // 4️⃣ Cleanup
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          this.loading = false;
         },
         error: (err) => {
-          if (err.status === 400) {
-            alert('No data to export');
-          } else {
-            console.error('Download failed', err);
-          }
+          this.loading = false;
         },
       });
   }

@@ -3,7 +3,6 @@ import { LayoutComponent } from './layout/components/layout/layout.component';
 import { NotfoundComponent } from './pages/components/notfound/notfound.component';
 import { CategoryComponent } from './pages/components/category/category.component';
 import { ProductComponent } from './pages/components/product/product.component';
-import { ProductImportComponent } from './pages/components/imports/product-import/product-import.component';
 import { CategoryImportComponent } from './pages/components/imports/category-import/category-import.component';
 import { authGuard } from './pages/components/auth/guards/auth.guard';
 
@@ -16,7 +15,6 @@ export const routes: Routes = [
         children : [
             {  path : '', component : CategoryComponent },
             {  path : 'products', component : ProductComponent },
-            {  path : 'import/product', component : ProductImportComponent },
             {  path : 'import/category', component : CategoryImportComponent },
                  
         ]

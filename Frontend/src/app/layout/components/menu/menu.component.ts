@@ -28,10 +28,9 @@ export class MenuComponent {
             ]
         },
         {
-            label: 'Imports',
+            label: 'Import',
             items: [
                 { label: 'Import Category', icon: 'pi pi-fw pi-id-card', routerLink: ['/product-management/import/category'] },
-                { label: 'Import Product', icon: 'pi pi-fw pi-check-square', routerLink: ['/product-management/import/product'] },
             ]
         }
     ];
