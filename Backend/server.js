@@ -8,9 +8,9 @@ dotenv.config();
 
 // Initialize Express app
 const app = express();
-
+const origins=process.env.CORS_ORIGIN?.split(',').map(o=>o.trim());
 app.use(express.json());
-app.use(cors());
+app.use(cors({origin:origins}));
 
 //connect to database
 connectDB();
