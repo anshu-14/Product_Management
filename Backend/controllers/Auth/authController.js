@@ -11,8 +11,17 @@ export const register = async (req, res) => {
       [email]
     );
 
+    const [existingUserName] = await pool.query(
+      "SELECT * FROM users WHERE UserName = ?",
+      [userName]
+    );
+
+
     if (existingUser.length > 0) {
       return res.status(400).json({ message: "Email already registered" });
+    }
+    if (existingUserName.length > 0) {
+      return res.status(400).json({ message: "UserName already registered" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -22,10 +31,10 @@ export const register = async (req, res) => {
       [userName, email, hashedPassword, 1]
     );
 
-    res.status(201).json({ message: "User registered successfully" });
+    res.status(201).json({ message: "User registered successfully", statusCode:1, });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error",  statusCode:0,});
   }
 };
 
@@ -62,9 +71,10 @@ export const login = async (req, res) => {
       message: "Login successful",
       token,
       user: { id: user.UserId, userName: user.UserName },
+      statusCode:1,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error",statusCode:0 });
   }
 };
