@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://productmanagement-api.onrender.com/api'
+    apiUrl: 'https://product-management-z700.onrender.com/api'
   };
   
