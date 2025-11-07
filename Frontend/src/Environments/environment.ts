@@ -1,5 +1,5 @@
 export const environment = {
     production: false,
-    apiUrl: 'http://localhost:5000/api'
+    apiUrl: 'https://product-management-z700.onrender.com/api'
   };
   

@@ -71,10 +71,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "CertifyIQ:build:production"
+              "buildTarget": "ProductManagement:build:production"
             },
             "development": {
-              "buildTarget": "CertifyIQ:build:development"
+              "buildTarget": "ProductManagement:build:development"
             }
           },
           "defaultConfiguration": "development"
