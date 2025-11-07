@@ -196,6 +196,7 @@ export class CategoryComponent {
       this.categoryForm.markAllAsTouched();
       return;
     }
+    this.visible = false;
     this.loading = true;
     const data = this.categoryForm.value;
     if (this.mode === 'edit') {
@@ -203,7 +204,6 @@ export class CategoryComponent {
         next: (res: any) => {
           console.log(res);
           this.loading = false;
-          this.visible = false;
           this.getCategoryList();
         },
         error: (err) => {

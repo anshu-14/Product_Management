@@ -230,6 +230,7 @@ export class ProductComponent implements OnInit {
       this.productForm.markAllAsTouched();
       return;
     }
+    this.visible = false;
      this.loading = true;
     const data = this.productForm.value;
 
@@ -238,7 +239,6 @@ export class ProductComponent implements OnInit {
         next: (res: any) => {
           console.log(res);
           this.loading = false;
-          this.visible = false;
           this.getProductsList();
         },
         error: (err) => {

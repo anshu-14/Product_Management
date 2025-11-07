@@ -5,13 +5,14 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { CategoryService } from '../../../../services/category.service';
 import { MessageService } from 'primeng/api';
 import { DividerModule } from 'primeng/divider';
+import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-category-import',
-  imports: [FileUploadModule, CommonModule, ButtonModule, DividerModule],
+  imports: [FileUploadModule, CommonModule, ButtonModule, DividerModule,LoaderComponent],
   templateUrl: './category-import.component.html',
   styleUrl: './category-import.component.scss',
-  providers: [MessageService],
+  
 })
 export class CategoryImportComponent {
   loading: boolean=false;
@@ -20,6 +21,7 @@ export class CategoryImportComponent {
     private messageService: MessageService,
   ) {}
   onUpload(event: any) {
+    this.loading=true;
     const file = event.files?.[0];
     if (!file) {
       this.messageService.add({
@@ -27,6 +29,7 @@ export class CategoryImportComponent {
         summary: 'Warning',
         detail: 'No file selected',
       });
+      this.loading=false;
       return;
     }
 
@@ -40,10 +43,10 @@ export class CategoryImportComponent {
           summary: 'Success',
           detail: res.message,
         });
-        console.log('Import summary:', res);
+        this.loading=false;
       },
       error: (err: any) => {
-        console.error(err);
+        this.loading=false;
         const msg = err.error?.message || 'File import failed';
         this.messageService.add({
           severity: 'error',
@@ -55,6 +58,7 @@ export class CategoryImportComponent {
   }
 
   downloadReport(){
+    this.loading=true;
     this.categoryService.downloadSample().subscribe({
         next: (response: any) => {
           const contentDisposition = response.headers.get(
